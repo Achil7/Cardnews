@@ -13,8 +13,7 @@ class GeminiGenerator(BaseGenerator):
         self.client = genai.Client(api_key=settings.gemini_api_key)
         self.model = settings.gemini_model
 
-    def generate_card_content(self, article: dict, num_slides: int = 6) -> CardContent:
-        sys_prompt = SYSTEM_PROMPT.format(slides=num_slides, body_end=num_slides - 1)
+    def generate_card_content(self, article: dict) -> CardContent:
         user_prompt = USER_PROMPT.format(
             source=article["source"],
             category=article.get("category", ""),
@@ -22,7 +21,6 @@ class GeminiGenerator(BaseGenerator):
             published=str(article.get("published_at", "")),
             summary=(article.get("summary") or "")[:1500],
             body=(article.get("content") or "")[:3000],
-            slides=num_slides,
         )
 
         logger.info(f"Calling Gemini {self.model}...")
@@ -30,7 +28,7 @@ class GeminiGenerator(BaseGenerator):
             model=self.model,
             contents=user_prompt,
             config=genai.types.GenerateContentConfig(
-                system_instruction=sys_prompt,
+                system_instruction=SYSTEM_PROMPT,
                 response_mime_type="application/json",
             ),
         )
@@ -43,8 +41,8 @@ class GeminiGenerator(BaseGenerator):
             logger.error(f"JSON parse failed: {e}\nRaw: {text[:500]}")
             raise
 
-        logger.info(f"Gemini returned {len(data.get('slides', []))} slides")
-        return self._validate_slides(data, num_slides)
+        logger.info(f"Gemini returned title: {data.get('title', '')[:30]}")
+        return self._validate(data)
 
     @staticmethod
     def _extract_json(text: str) -> str:

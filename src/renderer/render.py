@@ -28,45 +28,6 @@ def _get_accent(category: str) -> str:
     return ACCENT_COLORS.get(category, "#4A6CF7")
 
 
-def render_html(
-    slide: dict, index: int, total: int, source: str, category: str, handle: str = ""
-) -> str:
-    accent = _get_accent(category)
-    common = {
-        "handle": handle,
-        "date": datetime.now().strftime("%Y.%m.%d"),
-        "index": index,
-        "index_padded": f"{index:02d}",
-        "total": total,
-        "source": source,
-        "category": category.upper(),
-        "accent_color": accent,
-    }
-
-    if slide["type"] == "cover":
-        tpl = env.get_template("card_cover.html")
-        return tpl.render(
-            **common,
-            title=slide["title"],
-            subtitle=slide["subtitle"],
-            cover_image=slide.get("cover_image"),
-        )
-
-    if slide["type"] == "body":
-        tpl = env.get_template("card_body.html")
-        return tpl.render(**common, heading=slide["heading"], body=slide["body"])
-
-    if slide["type"] == "outro":
-        tpl = env.get_template("card_outro.html")
-        outro_common = {**common, "source": slide.get("source", source)}
-        return tpl.render(
-            **outro_common,
-            cta=slide.get("cta", "저장하고 공유해주세요!"),
-        )
-
-    raise ValueError(f"Unknown slide type: {slide['type']}")
-
-
 def _inline_css(html: str) -> str:
     css = _load_css()
     html = html.replace(
@@ -76,17 +37,47 @@ def _inline_css(html: str) -> str:
     return html
 
 
-async def render_post(
-    post_data: dict,
+def _deduplicate_caption(text: str) -> str:
+    lines = text.strip().split("\n")
+    seen = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            seen.append(line)
+            continue
+        if stripped not in [s.strip() for s in seen]:
+            seen.append(line)
+    return "\n".join(seen).strip()
+
+
+async def render_thumbnail(
+    card_data: dict,
     output_dir: Path,
     source: str,
     category: str,
     handle: str = "",
-) -> list[Path]:
+    cover_image: str | None = None,
+) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    slides = post_data["slides"]
-    total = len(slides)
-    paths = []
+
+    accent = _get_accent(category)
+    tpl = env.get_template("card_cover.html")
+    html = tpl.render(
+        handle=handle,
+        date=datetime.now().strftime("%Y.%m.%d"),
+        index=1,
+        index_padded="01",
+        total=1,
+        source=source,
+        category=category.upper(),
+        accent_color=accent,
+        title=card_data["title"],
+        subtitle=card_data.get("subtitle", ""),
+        cover_image=cover_image,
+    )
+    html = _inline_css(html)
+
+    thumb_path = output_dir / "thumbnail.jpg"
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
@@ -94,26 +85,26 @@ async def render_post(
             viewport={"width": 1080, "height": 1350},
             device_scale_factor=1,
         )
-
-        for i, slide in enumerate(slides, start=1):
-            html = render_html(slide, i, total, source, category, handle)
-            html = _inline_css(html)
-
-            page = await ctx.new_page()
-            await page.set_content(html, wait_until="networkidle")
-            out_path = output_dir / f"slide_{i}.jpg"
-            await page.screenshot(
-                path=str(out_path), type="jpeg", quality=92, full_page=False
-            )
-            await page.close()
-            paths.append(out_path)
-            logger.info(f"Rendered {out_path.name}")
-
+        page = await ctx.new_page()
+        await page.set_content(html, wait_until="networkidle")
+        await page.screenshot(
+            path=str(thumb_path), type="jpeg", quality=92, full_page=False
+        )
+        await page.close()
         await browser.close()
 
-    caption_text = post_data.get("caption", "") + "\n\n" + " ".join(
-        post_data.get("hashtags", [])
-    )
+    logger.info(f"Rendered {thumb_path.name}")
+
+    caption = card_data.get("caption", "")
+    hashtags_list = card_data.get("hashtags", [])
+    hashtags_str = " ".join(hashtags_list)
+
+    if hashtags_str and hashtags_str not in caption:
+        caption_text = caption + "\n\n" + hashtags_str
+    else:
+        caption_text = caption
+
+    caption_text = _deduplicate_caption(caption_text)
     (output_dir / "caption.txt").write_text(caption_text, encoding="utf-8")
 
-    return paths
+    return thumb_path

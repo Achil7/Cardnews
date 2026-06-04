@@ -13,30 +13,10 @@ CARD_NEWS_SCHEMA = {
     "properties": {
         "title": {"type": "string"},
         "subtitle": {"type": "string"},
-        "slides": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "string",
-                        "enum": ["cover", "body", "outro"],
-                    },
-                    "title": {"type": "string"},
-                    "subtitle": {"type": "string"},
-                    "heading": {"type": "string"},
-                    "body": {"type": "string"},
-                    "source": {"type": "string"},
-                    "cta": {"type": "string"},
-                },
-                "required": ["type"],
-                "additionalProperties": False,
-            },
-        },
         "caption": {"type": "string"},
         "hashtags": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["title", "subtitle", "slides", "caption", "hashtags"],
+    "required": ["title", "subtitle", "caption", "hashtags"],
     "additionalProperties": False,
 }
 
@@ -46,8 +26,7 @@ class OpenAIGenerator(BaseGenerator):
         self.client = OpenAI(api_key=settings.openai_api_key)
         self.model = settings.openai_model
 
-    def generate_card_content(self, article: dict, num_slides: int = 6) -> CardContent:
-        sys_prompt = SYSTEM_PROMPT.format(slides=num_slides, body_end=num_slides - 1)
+    def generate_card_content(self, article: dict) -> CardContent:
         user_prompt = USER_PROMPT.format(
             source=article["source"],
             category=article.get("category", ""),
@@ -55,13 +34,12 @@ class OpenAIGenerator(BaseGenerator):
             published=str(article.get("published_at", "")),
             summary=(article.get("summary") or "")[:1500],
             body=(article.get("content") or "")[:3000],
-            slides=num_slides,
         )
 
         logger.info(f"Calling OpenAI {self.model}...")
         resp = self.client.responses.create(
             model=self.model,
-            instructions=sys_prompt,
+            instructions=SYSTEM_PROMPT,
             input=user_prompt,
             text={
                 "format": {
@@ -74,5 +52,5 @@ class OpenAIGenerator(BaseGenerator):
         )
 
         data = json.loads(resp.output_text)
-        logger.info(f"OpenAI returned {len(data.get('slides', []))} slides")
-        return self._validate_slides(data, num_slides)
+        logger.info(f"OpenAI returned title: {data.get('title', '')[:30]}")
+        return self._validate(data)

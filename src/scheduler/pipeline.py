@@ -1,3 +1,4 @@
+import asyncio
 import json
 import shutil
 import traceback
@@ -6,14 +7,14 @@ from pathlib import Path
 
 from loguru import logger
 
-from config import PROJECT_ROOT, accounts_config, settings
+from config import PROJECT_ROOT, accounts_config
 from src.crawler.fetcher import fetch_all
-from src.crawler.image_fetcher import get_cover_image
+from src.crawler.image_fetcher import fetch_article_image, generate_ai_image
 from src.db.models import Article, Post
 from src.db.repository import db_session, init_db
 from src.generator import get_generator
 from src.notifier.telegram import send_telegram_notification
-from src.renderer.render import render_post
+from src.renderer.render import render_thumbnail
 from src.selector.ranker import select_for_all_accounts
 from src.uploader.drive import upload_post_to_drive
 
@@ -41,7 +42,6 @@ async def process_one(
             "content": a.content,
             "published_at": a.published_at,
         }
-        source = a.source
         post = Post(
             article_id=a.id,
             account_handle=account_handle,
@@ -58,7 +58,7 @@ async def process_one(
             f"[{account_handle}] Generating content for "
             f"{category}/{region}: {article_dict['title'][:50]}"
         )
-        card = generator.generate_card_content(article_dict, settings.slides_per_post)
+        card = generator.generate_card_content(article_dict)
     except Exception:
         logger.exception("Generate failed")
         with db_session() as s:
@@ -67,15 +67,19 @@ async def process_one(
             p.error_log = f"generate: {traceback.format_exc()}"
         return False, None
 
+    cover_data_uri = None
     try:
-        cover_data_uri = get_cover_image(
-            article_dict["url"], article_dict["title"], category
-        )
-        if cover_data_uri and card.raw_json.get("slides"):
-            card.raw_json["slides"][0]["cover_image"] = cover_data_uri
-            logger.info("Cover image attached to slide")
+        cover_bytes = fetch_article_image(article_dict["url"])
+        if not cover_bytes:
+            logger.info("No og:image, trying AI generation...")
+            cover_bytes = generate_ai_image(article_dict["title"], category)
+        if cover_bytes:
+            import base64
+            b64 = base64.b64encode(cover_bytes).decode("ascii")
+            cover_data_uri = f"data:image/jpeg;base64,{b64}"
+            logger.info("Cover image ready")
     except Exception as e:
-        logger.warning(f"Cover image fetch skipped: {e}")
+        logger.warning(f"Cover image fetch failed: {e}")
 
     today = datetime.now().strftime("%Y-%m-%d")
     region_label = REGION_LABEL.get(region, region)
@@ -84,9 +88,9 @@ async def process_one(
     out_dir = PROJECT_ROOT / "data" / "output" / today / account_handle / folder_name
 
     try:
-        logger.info(f"Rendering {len(card.slides)} slides...")
-        paths = await render_post(
-            card.raw_json, out_dir, source, category, handle=account_handle
+        await render_thumbnail(
+            card.raw_json, out_dir, article_dict["source"], category,
+            handle=account_handle, cover_image=cover_data_uri,
         )
     except Exception:
         logger.exception("Render failed")
@@ -107,7 +111,7 @@ async def process_one(
         a = s.get(Article, article_id)
         a.status = "generated"
 
-    logger.info(f"[{account_handle}] Post {post_id} rendered → {out_dir}")
+    logger.info(f"[{account_handle}] Post {post_id} saved → {out_dir}")
 
     drive_url = None
     try:
@@ -164,6 +168,7 @@ async def run_pipeline():
             results.append(success)
             if url and not drive_url:
                 drive_url = url
+            await asyncio.sleep(4)
 
     today_str = datetime.now().strftime("%Y-%m-%d")
     output_base = PROJECT_ROOT / "data" / "output" / today_str
