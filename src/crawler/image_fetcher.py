@@ -65,108 +65,93 @@ def _download_image(url: str, min_size: int = 5_000) -> bytes | None:
     return None
 
 
-def generate_ai_image(title: str, category: str) -> bytes | None:
-    """Gemini Imagen으로 뉴스 썸네일 이미지를 AI 생성한다."""
-    if not settings.gemini_api_key:
-        logger.warning("No Gemini API key for AI image generation")
+def verify_image_relevance(image_bytes: bytes, title: str) -> bool:
+    """gpt-4o-mini vision으로 이미지가 기사 제목과 관련 있는지 검증."""
+    if not settings.openai_api_key or settings.openai_api_key == "sk-...":
+        return True
+
+    try:
+        from openai import OpenAI
+
+        client = OpenAI(api_key=settings.openai_api_key)
+        b64 = base64.b64encode(image_bytes).decode("ascii")
+
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=10,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                f"뉴스 제목: \"{title}\"\n"
+                                "이 이미지가 위 뉴스 제목의 내용과 관련이 있나요? "
+                                "매체 로고만 있거나 내용과 전혀 무관한 이미지면 NO, "
+                                "관련 있으면 YES. 한 단어로만 답해."
+                            ),
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{b64}",
+                                "detail": "low",
+                            },
+                        },
+                    ],
+                }
+            ],
+        )
+        answer = resp.choices[0].message.content.strip().upper()
+        is_relevant = "YES" in answer
+        logger.info(f"Image relevance check: {answer} → {'relevant' if is_relevant else 'NOT relevant'}")
+        return is_relevant
+    except Exception as e:
+        logger.warning(f"Image relevance check failed: {e}")
+        return True
+
+
+def generate_ai_image(title: str, category: str, summary: str = "") -> bytes | None:
+    """OpenAI gpt-image-1으로 뉴스 기사 내용에 맞는 썸네일 이미지를 AI 생성한다."""
+    if not settings.openai_api_key or settings.openai_api_key == "sk-...":
+        logger.warning("No OpenAI API key for AI image generation")
         return None
 
-    category_scenes = {
-        "politics": (
-            "Korean National Assembly building exterior at night, "
-            "political podium with many microphones, dramatic spotlight beams, "
-            "silhouette of a suited figure, deep navy and red tones"
-        ),
-        "economy": (
-            "modern stock exchange trading floor with glowing screens, "
-            "financial charts and candlestick graphs projected on glass walls, "
-            "golden and green accent lighting, city skyline through windows"
-        ),
-        "world": (
-            "United Nations style circular assembly hall, "
-            "multiple national flags hanging in formation, "
-            "warm golden lighting, diplomatic atmosphere, globe motif"
-        ),
-        "tech": (
-            "close-up of glowing blue circuit board with data streams, "
-            "holographic interface projections, server room with blue LED lights, "
-            "futuristic and clean, cyan and purple tones"
-        ),
-        "entertainment": (
-            "Hollywood red carpet premiere with golden spotlights, "
-            "movie cameras flashing, velvet ropes, glamorous stage setting, "
-            "warm golden and magenta lighting"
-        ),
-        "health": (
-            "modern medical research laboratory with glowing microscopes, "
-            "DNA helix hologram, clean white and blue sterile environment, "
-            "subtle green accent lighting suggesting wellness and vitality"
-        ),
-        "sports": (
-            "grand stadium at night with dramatic floodlights, "
-            "vast green field, cheering crowd silhouettes in the stands, "
-            "dynamic motion blur, electric blue and orange tones"
-        ),
-        "general": (
-            "professional TV broadcast studio with multiple screens, "
-            "camera equipment silhouettes, breaking news atmosphere, "
-            "dramatic studio lighting with blue and white tones"
-        ),
-    }
-    scene = category_scenes.get(category, category_scenes["general"])
-
+    context = summary[:300] if summary else title
     prompt = (
-        f"A cinematic editorial news photograph for Instagram. "
-        f"Scene: {scene}. "
-        f"Ultra high quality, photorealistic, dramatic depth of field. "
-        f"Dark moody atmosphere with professional editorial lighting. "
-        f"Must look like a real editorial photograph, not a graphic design. "
-        f"Absolutely no text, no words, no letters, no watermarks, no UI elements. "
+        f"Create a photorealistic editorial news photograph that visually represents this news: "
+        f"\"{title}\". Context: {context}. "
+        f"Photojournalistic style, cinematic lighting, dramatic depth of field. "
+        f"Must visually relate to the specific news topic, not a generic scene. "
+        f"No text, no words, no letters, no watermarks, no UI elements. "
         f"Clean composition suitable as a background with text overlay. "
         f"Aspect ratio 3:4."
     )
 
     try:
-        from google import genai
+        from openai import OpenAI
 
-        client = genai.Client(api_key=settings.gemini_api_key)
-        logger.info("Generating AI thumbnail with Imagen...")
-        response = client.models.generate_images(
-            model="imagen-3.0-generate-002",
+        client = OpenAI(api_key=settings.openai_api_key)
+        logger.info("Generating AI thumbnail with DALL-E...")
+        response = client.images.generate(
+            model="gpt-image-1",
             prompt=prompt,
-            config=genai.types.GenerateImagesConfig(
-                number_of_images=1,
-                aspect_ratio="3:4",
-                safety_filter_level="BLOCK_ONLY_HIGH",
-            ),
+            size="1024x1024",
+            quality="low",
+            n=1,
         )
-        if response.generated_images:
+        img_data = response.data[0]
+        if img_data.b64_json:
             logger.info("AI thumbnail generated successfully")
-            return response.generated_images[0].image.image_bytes
+            return base64.b64decode(img_data.b64_json)
+        elif img_data.url:
+            img_resp = requests.get(img_data.url, timeout=30)
+            if img_resp.status_code == 200:
+                logger.info("AI thumbnail generated successfully")
+                return img_resp.content
     except Exception as e:
-        logger.warning(f"Imagen generation failed: {e}")
-
-    try:
-        from google import genai
-        from google.genai import types
-
-        client = genai.Client(api_key=settings.gemini_api_key)
-        logger.info("Trying Gemini native image generation...")
-        response = client.models.generate_content(
-            model="gemini-2.0-flash-exp",
-            contents=(
-                f"Generate an image: {prompt}"
-            ),
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE", "TEXT"],
-            ),
-        )
-        for part in response.candidates[0].content.parts:
-            if part.inline_data is not None:
-                logger.info("Gemini native image generated successfully")
-                return part.inline_data.data
-    except Exception as e:
-        logger.warning(f"Gemini native image generation failed: {e}")
+        logger.warning(f"DALL-E generation failed: {e}")
 
     return None
 

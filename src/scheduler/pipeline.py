@@ -9,7 +9,7 @@ from loguru import logger
 
 from config import PROJECT_ROOT, accounts_config
 from src.crawler.fetcher import fetch_all
-from src.crawler.image_fetcher import fetch_article_image, generate_ai_image
+from src.crawler.image_fetcher import fetch_article_image, generate_ai_image, verify_image_relevance
 from src.db.models import Article, Post
 from src.db.repository import db_session, init_db
 from src.generator import get_generator
@@ -70,9 +70,21 @@ async def process_one(
     cover_data_uri = None
     try:
         cover_bytes = fetch_article_image(article_dict["url"])
-        if not cover_bytes:
+        if cover_bytes:
+            if verify_image_relevance(cover_bytes, article_dict["title"]):
+                logger.info("og:image verified as relevant")
+            else:
+                logger.info("og:image not relevant, trying AI generation...")
+                cover_bytes = generate_ai_image(
+                    article_dict["title"], category,
+                    summary=article_dict.get("summary", ""),
+                )
+        else:
             logger.info("No og:image, trying AI generation...")
-            cover_bytes = generate_ai_image(article_dict["title"], category)
+            cover_bytes = generate_ai_image(
+                article_dict["title"], category,
+                summary=article_dict.get("summary", ""),
+            )
         if cover_bytes:
             import base64
             b64 = base64.b64encode(cover_bytes).decode("ascii")
