@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="card-cover {% if cover_image %}has-photo{% endif %}">
+  {% if cover_image %}
+  <div class="photo-bg" style="background-image: url('{{ cover_image }}');"></div>
+  <div class="photo-overlay"></div>
+  {% endif %}
+  <div class="content">
+    <div class="category-tag" style="background: {{ accent_color }}{% if cover_image %}dd{% else %}22{% endif %}; color: {% if cover_image %}#fff{% else %}{{ accent_color }}{% endif %};">{{ category }}</div>
+    <div class="accent-line" style="background: {{ accent_color }};"></div>
+    <div class="title">{{ title }}</div>
+    <div class="subtitle">{{ subtitle }}</div>
+  </div>
+  <div class="footer">
+    <span>@{{ handle }}</span>
+    <span>{{ date }}</span>
+  </div>
+</div>
+</body>
+</html>

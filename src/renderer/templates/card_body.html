@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="card-body">
+  <div class="accent-bar" style="background: {{ accent_color }};"></div>
+  <div class="slide-number">{{ index_padded }}</div>
+  <div class="content">
+    <div class="page-indicator">{{ index }} / {{ total }}</div>
+    <div class="heading">{{ heading }}</div>
+    <div class="body-text">{{ body }}</div>
+  </div>
+  <div class="footer">
+    <span>@{{ handle }}</span>
+    <span>{{ category }}</span>
+  </div>
+</div>
+</body>
+</html>

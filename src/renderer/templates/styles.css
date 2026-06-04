@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+
+:root {
+  --accent-general: #4A6CF7;
+  --accent-economy: #10B981;
+  --accent-entertainment: #F59E0B;
+  --accent-health: #EF4444;
+  --accent-sports: #6366F1;
+  --accent-world: #8B5CF6;
+  --accent-tech: #0EA5E9;
+  --accent-politics: #EF4444;
+  --accent-default: #4A6CF7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 1080px;
+  height: 1350px;
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === COVER === */
+.card-cover {
+  width: 1080px;
+  height: 1350px;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(160deg, #0f0f1a 0%, #1a1a3e 40%, #0d0d1f 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(74, 108, 247, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.card-cover .content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+.card-cover .category-tag {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  width: fit-content;
+}
+
+.card-cover .title {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 32px;
+}
+
+.card-cover .subtitle {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.5;
+  opacity: 0.75;
+  max-width: 800px;
+}
+
+.card-cover .accent-line {
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 40px;
+}
+
+.card-cover .footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.card-cover .footer span {
+  font-size: 22px;
+  font-weight: 400;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+
+/* === COVER WITH PHOTO === */
+.card-cover.has-photo { background: #000; }
+
+.card-cover .photo-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: cover;
+  background-position: center top;
+  z-index: 0;
+}
+
+.card-cover .photo-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,0.35) 0%,
+      rgba(0,0,0,0.05) 30%,
+      rgba(0,0,0,0.1) 50%,
+      rgba(0,0,0,0.65) 75%,
+      rgba(0,0,0,0.85) 100%
+    );
+  z-index: 1;
+}
+
+.card-cover.has-photo .content { justify-content: flex-end; padding-bottom: 20px; }
+
+.card-cover.has-photo .title {
+  text-shadow: 0 2px 20px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.card-cover.has-photo .subtitle {
+  opacity: 0.9;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.6);
+}
+
+.card-cover.has-photo .footer {
+  border-top-color: rgba(255,255,255,0.15);
+}
+
+.card-cover.has-photo .category-tag {
+  font-size: 20px;
+  padding: 8px 20px;
+}
+
+/* === BODY === */
+.card-body {
+  width: 1080px;
+  height: 1350px;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #FAFAF8;
+  color: #1a1a1a;
+  position: relative;
+}
+
+.card-body .accent-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+}
+
+.card-body .slide-number {
+  font-size: 120px;
+  font-weight: 900;
+  opacity: 0.04;
+  position: absolute;
+  right: 60px;
+  top: 40px;
+  line-height: 1;
+}
+
+.card-body .content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-body .page-indicator {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  opacity: 0.35;
+  margin-bottom: 48px;
+}
+
+.card-body .heading {
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  margin-bottom: 36px;
+  color: #111111;
+}
+
+.card-body .body-text {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: #444444;
+  max-width: 860px;
+}
+
+.card-body .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.card-body .footer span {
+  font-size: 20px;
+  font-weight: 400;
+  opacity: 0.35;
+  letter-spacing: 1px;
+}
+
+/* === OUTRO === */
+.card-outro {
+  width: 1080px;
+  height: 1350px;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(160deg, #0f0f1a 0%, #1a1a3e 40%, #0d0d1f 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-outro::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(74, 108, 247, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-outro .content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.card-outro .end-tag {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  opacity: 0.4;
+  margin-bottom: 48px;
+}
+
+.card-outro .cta {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1.3;
+  margin-bottom: 48px;
+  max-width: 800px;
+}
+
+.card-outro .divider {
+  width: 60px;
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 48px;
+}
+
+.card-outro .source-text {
+  font-size: 26px;
+  font-weight: 400;
+  opacity: 0.55;
+}
+
+.card-outro .footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.card-outro .footer span {
+  font-size: 22px;
+  font-weight: 400;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}

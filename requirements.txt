@@ -1,0 +1,50 @@
+# HTTP
+requests==2.32.3
+httpx==0.28.1
+
+# RSS / Crawling
+feedparser==6.0.11
+beautifulsoup4==4.12.3
+lxml==5.3.0
+newspaper4k==0.9.3.1
+
+# LLM - Triple provider
+anthropic==0.52.0
+openai==1.82.0
+google-genai==1.16.1
+
+# Image rendering
+playwright==1.52.0
+Pillow==11.2.1
+
+# Templating
+Jinja2==3.1.6
+
+# DB
+SQLAlchemy==2.0.41
+
+# Config
+python-dotenv==1.1.0
+pydantic==2.11.3
+pydantic-settings==2.9.1
+
+# Logging
+loguru==0.7.3
+
+# Utils
+python-dateutil==2.9.0
+pytz==2025.2
+
+# Google Drive Upload
+google-api-python-client==2.197.0
+google-auth-oauthlib==1.4.0
+google-auth-httplib2==0.4.0
+
+# YAML config
+PyYAML==6.0.2
+
+# Scheduling
+APScheduler==3.10.4
+
+# Testing
+pytest==8.3.5

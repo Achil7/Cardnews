@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  cardnews:
+    image: achil7/cardnews:latest
+    container_name: cardnews-app
+    env_file:
+      - .env
+    volumes:
+      # Google Drive 인증 토큰 (최초 1회 로컬에서 인증 후 복사)
+      - ./token.json:/app/token.json
+      - ./credentials.json:/app/credentials.json
+      # accounts.yaml (서버에서 직접 수정 가능)
+      - ./accounts.yaml:/app/accounts.yaml
+    restart: unless-stopped

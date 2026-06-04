@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+data/db.sqlite
+data/output/
+logs/
+.pytest_cache/
+.DS_Store
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+credentials.json
+token.json
+.claude/
