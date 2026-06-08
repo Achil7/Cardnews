@@ -50,7 +50,7 @@ def _deduplicate_caption(text: str) -> str:
     return "\n".join(seen).strip()
 
 
-async def render_thumbnail(
+async def render_slides(
     card_data: dict,
     output_dir: Path,
     source: str,
@@ -61,13 +61,16 @@ async def render_thumbnail(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     accent = _get_accent(category)
-    tpl = env.get_template("card_cover.html")
-    html = tpl.render(
+    body_cards = card_data.get("body_cards", [])
+    total = 1 + len(body_cards)
+
+    cover_tpl = env.get_template("card_cover.html")
+    cover_html = cover_tpl.render(
         handle=handle,
         date=datetime.now().strftime("%Y.%m.%d"),
         index=1,
         index_padded="01",
-        total=1,
+        total=total,
         source=source,
         category=category.upper(),
         accent_color=accent,
@@ -75,9 +78,23 @@ async def render_thumbnail(
         subtitle=card_data.get("subtitle", ""),
         cover_image=cover_image,
     )
-    html = _inline_css(html)
+    cover_html = _inline_css(cover_html)
 
-    thumb_path = output_dir / "thumbnail.jpg"
+    body_tpl = env.get_template("card_body.html")
+    body_htmls = []
+    for i, card in enumerate(body_cards):
+        idx = i + 2
+        html = body_tpl.render(
+            handle=handle,
+            index=idx,
+            index_padded=f"{idx:02d}",
+            total=total,
+            category=category.upper(),
+            accent_color=accent,
+            heading=card["heading"],
+            body=card["body"],
+        )
+        body_htmls.append(_inline_css(html))
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
@@ -86,14 +103,20 @@ async def render_thumbnail(
             device_scale_factor=1,
         )
         page = await ctx.new_page()
-        await page.set_content(html, wait_until="networkidle")
-        await page.screenshot(
-            path=str(thumb_path), type="jpeg", quality=92, full_page=False
-        )
+
+        await page.set_content(cover_html, wait_until="networkidle")
+        slide_1 = output_dir / "slide_1.jpg"
+        await page.screenshot(path=str(slide_1), type="jpeg", quality=92, full_page=False)
+        logger.info(f"Rendered slide_1.jpg (cover)")
+
+        for i, bhtml in enumerate(body_htmls):
+            slide_path = output_dir / f"slide_{i + 2}.jpg"
+            await page.set_content(bhtml, wait_until="networkidle")
+            await page.screenshot(path=str(slide_path), type="jpeg", quality=92, full_page=False)
+            logger.info(f"Rendered slide_{i + 2}.jpg (body)")
+
         await page.close()
         await browser.close()
-
-    logger.info(f"Rendered {thumb_path.name}")
 
     caption = card_data.get("caption", "")
     hashtags_list = card_data.get("hashtags", [])
@@ -107,4 +130,4 @@ async def render_thumbnail(
     caption_text = _deduplicate_caption(caption_text)
     (output_dir / "caption.txt").write_text(caption_text, encoding="utf-8")
 
-    return thumb_path
+    return slide_1

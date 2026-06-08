@@ -14,7 +14,7 @@ from src.db.models import Article, Post
 from src.db.repository import db_session, init_db
 from src.generator import get_generator
 from src.notifier.telegram import send_telegram_notification
-from src.renderer.render import render_thumbnail
+from src.renderer.render import render_slides
 from src.selector.ranker import select_for_all_accounts
 from src.uploader.drive import upload_post_to_drive
 
@@ -100,7 +100,7 @@ async def process_one(
     out_dir = PROJECT_ROOT / "data" / "output" / today / account_handle / folder_name
 
     try:
-        await render_thumbnail(
+        await render_slides(
             card.raw_json, out_dir, article_dict["source"], category,
             handle=account_handle, cover_image=cover_data_uri,
         )

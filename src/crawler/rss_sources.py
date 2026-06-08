@@ -108,6 +108,13 @@ RSS_SOURCES = [
         "language": "en",
         "weight": 1.3,
     },
+    {
+        "name": "cnn_entertainment",
+        "url": "http://rss.cnn.com/rss/cnn_showbiz.rss",
+        "category": "entertainment",
+        "language": "en",
+        "weight": 1.2,
+    },
     # ──────────────────────────────────────
     # 해외 건강 (health, en)
     # ──────────────────────────────────────
@@ -117,6 +124,20 @@ RSS_SOURCES = [
         "category": "health",
         "language": "en",
         "weight": 1.3,
+    },
+    {
+        "name": "cnn_health",
+        "url": "http://rss.cnn.com/rss/cnn_health.rss",
+        "category": "health",
+        "language": "en",
+        "weight": 1.2,
+    },
+    {
+        "name": "npr_health",
+        "url": "https://feeds.npr.org/1128/rss.xml",
+        "category": "health",
+        "language": "en",
+        "weight": 1.0,
     },
     # ──────────────────────────────────────
     # 해외 스포츠 (sports, en)

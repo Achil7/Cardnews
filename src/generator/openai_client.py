@@ -8,15 +8,26 @@ from .base import BaseGenerator, CardContent
 from .prompt import SYSTEM_PROMPT, USER_PROMPT
 
 
+BODY_CARD_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "heading": {"type": "string"},
+        "body": {"type": "string"},
+    },
+    "required": ["heading", "body"],
+    "additionalProperties": False,
+}
+
 CARD_NEWS_SCHEMA = {
     "type": "object",
     "properties": {
         "title": {"type": "string"},
         "subtitle": {"type": "string"},
+        "body_cards": {"type": "array", "items": BODY_CARD_SCHEMA},
         "caption": {"type": "string"},
         "hashtags": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["title", "subtitle", "caption", "hashtags"],
+    "required": ["title", "subtitle", "body_cards", "caption", "hashtags"],
     "additionalProperties": False,
 }
 
