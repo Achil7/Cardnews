@@ -57,10 +57,11 @@ async def render_slides(
     category: str,
     handle: str = "",
     cover_image: str | None = None,
+    file_prefix: str = "",
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    hour_tag = datetime.now().strftime("%H")
+    prefix = f"{file_prefix}_" if file_prefix else ""
     accent = _get_accent(category)
     body_cards = card_data.get("body_cards", [])
     total = 1 + len(body_cards)
@@ -106,15 +107,15 @@ async def render_slides(
         page = await ctx.new_page()
 
         await page.set_content(cover_html, wait_until="networkidle")
-        slide_1 = output_dir / f"{hour_tag}_slide_1.jpg"
+        slide_1 = output_dir / f"{prefix}1.jpg"
         await page.screenshot(path=str(slide_1), type="jpeg", quality=92, full_page=False)
-        logger.info(f"Rendered {hour_tag}_slide_1.jpg (cover)")
+        logger.info(f"Rendered {prefix}1.jpg (cover)")
 
         for i, bhtml in enumerate(body_htmls):
-            slide_path = output_dir / f"{hour_tag}_slide_{i + 2}.jpg"
+            slide_path = output_dir / f"{prefix}{i + 2}.jpg"
             await page.set_content(bhtml, wait_until="networkidle")
             await page.screenshot(path=str(slide_path), type="jpeg", quality=92, full_page=False)
-            logger.info(f"Rendered {hour_tag}_slide_{i + 2}.jpg (body)")
+            logger.info(f"Rendered {prefix}{i + 2}.jpg (body)")
 
         await page.close()
         await browser.close()
@@ -129,6 +130,6 @@ async def render_slides(
         caption_text = caption
 
     caption_text = _deduplicate_caption(caption_text)
-    (output_dir / f"{hour_tag}_caption.txt").write_text(caption_text, encoding="utf-8")
+    (output_dir / f"{prefix}caption.txt").write_text(caption_text, encoding="utf-8")
 
     return slide_1

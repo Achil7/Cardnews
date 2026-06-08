@@ -94,15 +94,18 @@ async def process_one(
         logger.warning(f"Cover image fetch failed: {e}")
 
     today = datetime.now().strftime("%Y-%m-%d")
+    date_short = datetime.now().strftime("%m%d")
     region_label = REGION_LABEL.get(region, region)
     category_label = accounts_config.get_label_ko(category)
     folder_name = f"{region_label}_{category_label}"
+    file_prefix = f"{date_short}_{region_label}{category_label}"
     out_dir = PROJECT_ROOT / "data" / "output" / today / account_handle / folder_name
 
     try:
         await render_slides(
             card.raw_json, out_dir, article_dict["source"], category,
             handle=account_handle, cover_image=cover_data_uri,
+            file_prefix=file_prefix,
         )
     except Exception:
         logger.exception("Render failed")
