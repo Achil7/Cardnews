@@ -5,8 +5,8 @@ from src.logging_config import setup_logging
 from src.scheduler.pipeline import run_pipeline
 
 
-def run_once():
-    asyncio.run(run_pipeline())
+def run_once(test: bool = False):
+    asyncio.run(run_pipeline(test=test))
 
 
 def run_daemon():
@@ -36,9 +36,14 @@ if __name__ == "__main__":
         action="store_true",
         help="Run as daemon with APScheduler (UTC 04:00, 23:00)",
     )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Test mode: generate only 1 cardnews",
+    )
     args = parser.parse_args()
 
     if args.daemon:
         run_daemon()
     else:
-        run_once()
+        run_once(test=args.test)

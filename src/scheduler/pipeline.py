@@ -151,7 +151,7 @@ def _cleanup_empty_dirs(base_dir: Path):
                 child.rmdir()
 
 
-async def run_pipeline():
+async def run_pipeline(test: bool = False):
     init_db()
     logger.info("=== Pipeline start ===")
 
@@ -166,6 +166,12 @@ async def run_pipeline():
         today = datetime.now().strftime("%Y-%m-%d")
         send_telegram_notification(date=today, total=0, success=0, failed=0)
         return
+
+    if test:
+        first_handle = next(iter(assignments))
+        first_item = assignments[first_handle][0]
+        assignments = {first_handle: [first_item]}
+        logger.info(f"[TEST] 1건만 생성: {first_handle} / {first_item['category']} / {first_item['region']}")
 
     results = []
     drive_url = None

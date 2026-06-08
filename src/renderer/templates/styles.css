@@ -99,13 +99,14 @@ html, body {
 }
 
 /* === COVER WITH PHOTO === */
-.card-cover.has-photo { background: #000; }
+.card-cover.has-photo { background: #0a0a14; }
 
 .card-cover .photo-bg {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-size: cover;
-  background-position: center top;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
   z-index: 0;
 }
 
