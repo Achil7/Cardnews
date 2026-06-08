@@ -64,7 +64,7 @@ async def render_slides(
     prefix = f"{file_prefix}_" if file_prefix else ""
     accent = _get_accent(category)
     body_cards = card_data.get("body_cards", [])
-    total = 1 + len(body_cards)
+    total = 1 + len(body_cards) + 1
 
     cover_tpl = env.get_template("card_cover.html")
     cover_html = cover_tpl.render(
@@ -116,6 +116,19 @@ async def render_slides(
             await page.set_content(bhtml, wait_until="networkidle")
             await page.screenshot(path=str(slide_path), type="jpeg", quality=92, full_page=False)
             logger.info(f"Rendered {prefix}{i + 2}.jpg (body)")
+
+        outro_tpl = env.get_template("card_outro.html")
+        outro_html = outro_tpl.render(
+            handle=handle,
+            source=source,
+            accent_color=accent,
+        )
+        outro_html = _inline_css(outro_html)
+        outro_idx = len(body_cards) + 2
+        outro_path = output_dir / f"{prefix}{outro_idx}.jpg"
+        await page.set_content(outro_html, wait_until="networkidle")
+        await page.screenshot(path=str(outro_path), type="jpeg", quality=92, full_page=False)
+        logger.info(f"Rendered {prefix}{outro_idx}.jpg (outro)")
 
         await page.close()
         await browser.close()

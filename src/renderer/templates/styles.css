@@ -283,10 +283,28 @@ html, body {
   margin-bottom: 48px;
 }
 
-.card-outro .source-text {
-  font-size: 26px;
+.card-outro .follow-guide {
+  margin-bottom: 48px;
+}
+
+.card-outro .follow-item {
+  font-size: 30px;
   font-weight: 400;
-  opacity: 0.55;
+  line-height: 2;
+  opacity: 0.8;
+}
+
+.card-outro .handle-big {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 32px;
+}
+
+.card-outro .source-text {
+  font-size: 22px;
+  font-weight: 400;
+  opacity: 0.35;
 }
 
 .card-outro .footer {
