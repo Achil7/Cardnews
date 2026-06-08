@@ -1,4 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -69,7 +71,7 @@ async def render_slides(
     cover_tpl = env.get_template("card_cover.html")
     cover_html = cover_tpl.render(
         handle=handle,
-        date=datetime.now().strftime("%Y.%m.%d"),
+        date=datetime.now(KST).strftime("%Y.%m.%d"),
         index=1,
         index_padded="01",
         total=total,

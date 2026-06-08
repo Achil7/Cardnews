@@ -2,8 +2,10 @@ import asyncio
 import json
 import shutil
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+KST = timezone(timedelta(hours=9))
 
 from loguru import logger
 
@@ -93,8 +95,8 @@ async def process_one(
     except Exception as e:
         logger.warning(f"Cover image fetch failed: {e}")
 
-    today = datetime.now().strftime("%Y-%m-%d")
-    date_short = datetime.now().strftime("%m%d")
+    today = datetime.now(KST).strftime("%Y-%m-%d")
+    date_short = datetime.now(KST).strftime("%m%d")
     region_label = REGION_LABEL.get(region, region)
     category_label = accounts_config.get_label_ko(category)
     folder_name = f"{region_label}_{category_label}"
@@ -166,7 +168,7 @@ async def run_pipeline(test: bool = False):
     total_assigned = sum(len(v) for v in assignments.values())
     if not assignments or total_assigned == 0:
         logger.warning("No articles selected. Pipeline done (nothing to process).")
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = datetime.now(KST).strftime("%Y-%m-%d")
         send_telegram_notification(date=today, total=0, success=0, failed=0)
         return
 
@@ -191,7 +193,7 @@ async def run_pipeline(test: bool = False):
                 drive_url = url
             await asyncio.sleep(4)
 
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_str = datetime.now(KST).strftime("%Y-%m-%d")
     output_base = PROJECT_ROOT / "data" / "output" / today_str
     _cleanup_empty_dirs(output_base)
 
