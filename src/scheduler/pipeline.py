@@ -95,12 +95,14 @@ async def process_one(
     except Exception as e:
         logger.warning(f"Cover image fetch failed: {e}")
 
-    today = datetime.now(KST).strftime("%Y-%m-%d")
-    date_short = datetime.now(KST).strftime("%m%d")
+    now_kst = datetime.now(KST)
+    today = now_kst.strftime("%Y-%m-%d")
+    date_short = now_kst.strftime("%m%d")
+    hour_tag = now_kst.strftime("%H")
     region_label = REGION_LABEL.get(region, region)
     category_label = accounts_config.get_label_ko(category)
     folder_name = f"{region_label}_{category_label}"
-    file_prefix = f"{date_short}_{region_label}{category_label}"
+    file_prefix = f"{date_short}_{hour_tag}_{region_label}{category_label}"
     out_dir = PROJECT_ROOT / "data" / "output" / today / account_handle / folder_name
 
     try:
