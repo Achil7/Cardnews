@@ -10,74 +10,14 @@
 <div class="container">
   <div class="header-bar">
     <h1>Meme Cardnews</h1>
-    <button class="btn btn-secondary btn-sm" id="btnSettings" onclick="toggleSettings()">설정</button>
   </div>
 
-  <!-- 설정 패널 -->
-  <div class="step-panel" id="settingsPanel" style="display:none;">
-    <div class="step-title">설정</div>
-
-    <div class="settings-section">
-      <div class="settings-label">계정 & 타겟</div>
-      <div class="two-col" style="margin-bottom:20px;">
-        <div class="field-group">
-          <div class="field-label"><span>계정 핸들</span></div>
-          <select class="field-input" id="settingHandle"></select>
-        </div>
-        <div class="field-group">
-          <div class="field-label"><span>타겟 연령대</span></div>
-          <select class="field-input" id="settingDemo"></select>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-label">API 키</div>
-      <div class="field-group">
-        <div class="field-label"><span>Anthropic (Claude)</span></div>
-        <input type="password" class="field-input" id="setAnthropicKey" placeholder="sk-ant-...">
-      </div>
-      <div class="field-group">
-        <div class="field-label"><span>OpenAI</span></div>
-        <input type="password" class="field-input" id="setOpenaiKey" placeholder="sk-proj-...">
-      </div>
-      <div class="field-group">
-        <div class="field-label"><span>Gemini</span></div>
-        <input type="password" class="field-input" id="setGeminiKey" placeholder="AQ...">
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-label">Google Drive & Telegram</div>
-      <div class="two-col">
-        <div class="field-group">
-          <div class="field-label"><span>Drive 폴더 ID</span></div>
-          <input type="text" class="field-input" id="setDriveId">
-        </div>
-        <div class="field-group">
-          <div class="field-label"><span>Telegram Chat ID</span></div>
-          <input type="text" class="field-input" id="setTelegramChat">
-        </div>
-      </div>
-      <div class="two-col">
-        <div class="field-group">
-          <div class="field-label"><span>Telegram Bot Token</span></div>
-          <input type="password" class="field-input" id="setTelegramToken">
-        </div>
-        <div></div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-secondary" onclick="toggleSettings()">닫기</button>
-      <button class="btn btn-primary" id="btnSaveSettings" onclick="saveSettings()">저장</button>
-    </div>
-  </div>
-
-  <!-- 상태 바 -->
+  <!-- 상태 바 (타겟 연령대는 여기서 직접 선택) -->
   <div class="status-bar" id="statusBar">
     <span id="statusAccount">계정: -</span>
-    <span id="statusDemo">타겟: -</span>
+    <span class="status-demo">타겟:
+      <select id="settingDemo" class="status-select"></select>
+    </span>
     <span id="statusKeys" class="status-dot red">API 확인 중...</span>
   </div>
 

@@ -67,37 +67,25 @@ async function init() {
 // --- Settings ---
 async function loadAccountInfo() {
   const data = await api('/accounts');
-  const handleSel = document.getElementById('settingHandle');
   const demoSel = document.getElementById('settingDemo');
 
-  handleSel.innerHTML = '';
-  for (const a of (data.accounts || [])) {
-    handleSel.innerHTML += `<option value="${a.handle}">${a.handle}</option>`;
-  }
+  // 밈 계정은 1개뿐이라 첫 계정으로 고정 (선택 UI 없음)
+  activeHandle = (data.accounts && data.accounts[0]) ? data.accounts[0].handle : 'TBD_meme';
 
   demoSel.innerHTML = '';
   for (const c of (data.categories || [])) {
     demoSel.innerHTML += `<option value="${c.demographic}">${c.label_ko} (${c.demographic})</option>`;
   }
 
-  activeHandle = handleSel.value;
   activeDemographic = demoSel.value;
   updateStatusBar();
 
-  handleSel.addEventListener('change', () => { activeHandle = handleSel.value; updateStatusBar(); });
   demoSel.addEventListener('change', () => { activeDemographic = demoSel.value; updateStatusBar(); });
 }
 
 async function loadSettingsStatus() {
   const data = await api('/settings');
   const el = document.getElementById('statusKeys');
-
-  document.getElementById('setAnthropicKey').value = data.anthropic_api_key || '';
-  document.getElementById('setOpenaiKey').value = data.openai_api_key || '';
-  document.getElementById('setGeminiKey').value = data.gemini_api_key || '';
-  document.getElementById('setDriveId').value = data.google_drive_folder_id || '';
-  document.getElementById('setTelegramChat').value = data.telegram_chat_id || '';
-  document.getElementById('setTelegramToken').value = data.telegram_bot_token || '';
 
   if (data.keys_configured) {
     el.className = 'status-dot green';
@@ -110,43 +98,12 @@ async function loadSettingsStatus() {
 
 function updateStatusBar() {
   document.getElementById('statusAccount').textContent = `계정: ${activeHandle || '-'}`;
-  document.getElementById('statusDemo').textContent = `타겟: ${activeDemographic || '-'}`;
-}
-
-function toggleSettings() {
-  const panel = document.getElementById('settingsPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
-
-async function saveSettings() {
-  const body = {
-    anthropic_api_key: document.getElementById('setAnthropicKey').value,
-    openai_api_key: document.getElementById('setOpenaiKey').value,
-    gemini_api_key: document.getElementById('setGeminiKey').value,
-    google_drive_folder_id: document.getElementById('setDriveId').value,
-    telegram_bot_token: document.getElementById('setTelegramToken').value,
-    telegram_chat_id: document.getElementById('setTelegramChat').value,
-  };
-
-  const data = await api('/settings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-
-  if (data.status === 'saved') {
-    toast('설정 저장 완료. 프로그램을 재시작하면 적용됩니다.', 'success');
-    toggleSettings();
-    loadSettingsStatus();
-  } else {
-    toast('설정 저장 실패', 'error');
-  }
 }
 
 // --- Step Navigation ---
 function goStep(n) {
   currentStep = n;
-  document.querySelectorAll('.step-panel:not(#settingsPanel)').forEach((p, i) => {
+  document.querySelectorAll('.step-panel').forEach((p, i) => {
     p.classList.toggle('active', i + 1 === n);
   });
   document.querySelectorAll('.step-indicator').forEach((el, i) => {
