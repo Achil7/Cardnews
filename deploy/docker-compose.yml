@@ -9,6 +9,8 @@ services:
     ports:
       - "8501:8501"
     volumes:
+      # .env (GUI 설정 페이지가 키를 읽고/저장하려면 파일이 컨테이너 안에 있어야 함)
+      - ./.env:/app/.env
       # Google Drive 인증 토큰 (최초 1회 로컬에서 인증 후 복사)
       - ./token.json:/app/token.json
       - ./credentials.json:/app/credentials.json
