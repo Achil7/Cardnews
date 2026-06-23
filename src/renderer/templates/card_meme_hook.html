@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="meme-hook">
+  {% if cover_image %}
+  <div class="meme-img" style="background-image: url('{{ cover_image }}');"></div>
+  {% else %}
+  <div class="meme-img meme-img-empty"></div>
+  {% endif %}
+  <div class="meme-text-area meme-text-{{ layout|default('bottom') }}">
+    <div class="meme-hook-text">{{ text }}</div>
+  </div>
+  <div class="meme-watermark">@{{ handle }}</div>
+</div>
+</body>
+</html>

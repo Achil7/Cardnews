@@ -9,6 +9,10 @@ cd /app && python -c "from src.db.repository import init_db; init_db()"
 
 echo "=== Cardnews container started ==="
 echo "Cron schedule: UTC 23:00 (KST 08:00), UTC 04:00 (KST 13:00)"
+echo "GUI server: http://0.0.0.0:8501"
 
-# cron 데몬 시작 (foreground)
-cron -f
+# cron 데몬 백그라운드 시작
+cron
+
+# GUI 서버 foreground 실행
+cd /app && python -m uvicorn src.gui.app:app --host 0.0.0.0 --port 8501 --log-level info

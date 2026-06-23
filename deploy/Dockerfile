@@ -16,7 +16,11 @@ RUN playwright install chromium
 COPY config.py .
 COPY accounts.yaml .
 COPY main.py .
+COPY gui_main.py .
 COPY src/ ./src/
+
+# GUI 포트
+EXPOSE 8501
 
 # 데이터/로그 디렉토리 생성
 RUN mkdir -p data logs

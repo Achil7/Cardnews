@@ -3,10 +3,15 @@ import asyncio
 
 from src.logging_config import setup_logging
 from src.scheduler.pipeline import run_pipeline
+from src.scheduler.meme_pipeline import run_meme_pipeline
 
 
 def run_once(test: bool = False):
     asyncio.run(run_pipeline(test=test))
+
+
+def run_meme(test: bool = False):
+    asyncio.run(run_meme_pipeline(test=test))
 
 
 def run_daemon():
@@ -41,9 +46,16 @@ if __name__ == "__main__":
         action="store_true",
         help="Test mode: generate only 1 cardnews",
     )
+    parser.add_argument(
+        "--meme",
+        action="store_true",
+        help="Run meme/humor pipeline instead of news",
+    )
     args = parser.parse_args()
 
     if args.daemon:
         run_daemon()
+    elif args.meme:
+        run_meme(test=args.test)
     else:
         run_once(test=args.test)

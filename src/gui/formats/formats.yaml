@@ -1,0 +1,11 @@
+formats:
+  - id: "classic_dark"
+    name: "클래식 다크"
+    description: "어두운 배경 + 이미지 분석 기반 텍스트 배치"
+    thumbnail: "format_classic.jpg"
+    templates:
+      hook: "card_meme_hook.html"
+      screenshot: "card_meme_screenshot.html"
+      punchline: "card_meme_punchline.html"
+      outro: "card_meme_outro.html"
+    style_overrides: {}

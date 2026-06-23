@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Anthropic
     anthropic_api_key: str = ""
-    anthropic_model: str = "claude-sonnet-4-5-20250514"
+    anthropic_model: str = "claude-sonnet-4-6"
 
     # Gemini
     gemini_api_key: str = ""
@@ -60,13 +60,32 @@ class AccountConfig(BaseModel):
     enabled: bool = True
 
 
+class MemeCategoryConfig(BaseModel):
+    id: str
+    label_ko: str
+    accent_color: str
+    demographic: str
+
+
+class MemeAccountConfig(BaseModel):
+    handle: str
+    enabled: bool = True
+    demographics: list[str] = []
+
+
 class AccountsConfig(BaseModel):
     categories: list[CategoryConfig]
     accounts: list[AccountConfig]
+    meme_categories: list[MemeCategoryConfig] = []
+    meme_accounts: list[MemeAccountConfig] = []
 
     @property
     def enabled_accounts(self) -> list[AccountConfig]:
         return [a for a in self.accounts if a.enabled]
+
+    @property
+    def enabled_meme_accounts(self) -> list[MemeAccountConfig]:
+        return [a for a in self.meme_accounts if a.enabled]
 
     @property
     def category_ids(self) -> list[str]:
@@ -76,13 +95,25 @@ class AccountsConfig(BaseModel):
         for c in self.categories:
             if c.id == category_id:
                 return c.accent_color
+        for mc in self.meme_categories:
+            if mc.id == category_id:
+                return mc.accent_color
         return "#4A6CF7"
 
     def get_label_ko(self, category_id: str) -> str:
         for c in self.categories:
             if c.id == category_id:
                 return c.label_ko
+        for mc in self.meme_categories:
+            if mc.id == category_id:
+                return mc.label_ko
         return category_id
+
+    def get_meme_category(self, demographic: str) -> MemeCategoryConfig | None:
+        for mc in self.meme_categories:
+            if mc.demographic == demographic:
+                return mc
+        return None
 
 
 def load_accounts_config() -> AccountsConfig:

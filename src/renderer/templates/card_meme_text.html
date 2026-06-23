@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="meme-text-slide">
+  <div class="meme-text-content">
+    {% for line in lines %}
+    <p class="meme-text-line">{{ line }}</p>
+    {% endfor %}
+  </div>
+  {% if punchline %}
+  <div class="meme-punchline" style="color: {{ accent_color }};">{{ punchline }}</div>
+  {% endif %}
+  <div class="meme-watermark-light">@{{ handle }}</div>
+</div>
+</body>
+</html>

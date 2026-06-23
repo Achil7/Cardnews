@@ -39,8 +39,11 @@ class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True)
-    article_id = Column(Integer, ForeignKey("articles.id"), nullable=False, index=True)
+    article_id = Column(Integer, ForeignKey("articles.id"), nullable=True, index=True)
     account_handle = Column(String, nullable=True, index=True)
+    content_type = Column(String, default="news", index=True)
+    demographic = Column(String, nullable=True)
+    research_topic = Column(Text, nullable=True)
     slides_json = Column(Text)
     caption = Column(Text)
     hashtags = Column(Text)
@@ -50,6 +53,27 @@ class Post(Base):
     status = Column(String, default="pending", index=True)
     # status: pending | rendered | uploaded | published | failed
     error_log = Column(Text)
+
+
+class CommunityPost(Base):
+    __tablename__ = "community_posts"
+
+    id = Column(Integer, primary_key=True)
+    url = Column(String, unique=True, nullable=False, index=True)
+    url_hash = Column(String(32), unique=True, nullable=False, index=True)
+    source_name = Column(String, nullable=False)
+    site = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    content = Column(Text)
+    top_comments = Column(Text)
+    likes = Column(Integer, default=0)
+    comment_count = Column(Integer, default=0)
+    views = Column(Integer, default=0)
+    category = Column(String)
+    published_at = Column(DateTime, index=True)
+    fetched_at = Column(DateTime, default=datetime.utcnow)
+    score = Column(Float, default=0.0)
+    status = Column(String, default="new", index=True)
 
 
 class RunLog(Base):

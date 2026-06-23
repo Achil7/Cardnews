@@ -6,10 +6,14 @@ services:
     container_name: cardnews-app
     env_file:
       - .env
+    ports:
+      - "8501:8501"
     volumes:
       # Google Drive 인증 토큰 (최초 1회 로컬에서 인증 후 복사)
       - ./token.json:/app/token.json
       - ./credentials.json:/app/credentials.json
       # accounts.yaml (서버에서 직접 수정 가능)
       - ./accounts.yaml:/app/accounts.yaml
+      # DB 영속성
+      - ./data:/app/data
     restart: unless-stopped
