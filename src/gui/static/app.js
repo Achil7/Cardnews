@@ -217,6 +217,23 @@ const fileInput = document.getElementById('fileInput');
 dropZone.addEventListener('drop', ev => uploadFiles(ev.dataTransfer.files));
 fileInput.addEventListener('change', ev => uploadFiles(ev.target.files));
 
+// 클립보드 붙여넣기(Ctrl+V) — 캡처/복사한 이미지를 바로 업로드 (스크린샷 단계에서만)
+document.addEventListener('paste', ev => {
+  if (currentStep !== 2) return;
+  const items = (ev.clipboardData && ev.clipboardData.items) || [];
+  const images = [];
+  for (const it of items) {
+    if (it.kind === 'file' && it.type.startsWith('image/')) {
+      const f = it.getAsFile();
+      if (f) images.push(f);
+    }
+  }
+  if (images.length) {
+    ev.preventDefault();
+    uploadFiles(images);
+  }
+});
+
 async function uploadFiles(fileList) {
   if (!fileList.length) return;
   const form = new FormData();
