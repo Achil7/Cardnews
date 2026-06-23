@@ -74,7 +74,8 @@ async function loadAccountInfo() {
 
   demoSel.innerHTML = '';
   for (const c of (data.categories || [])) {
-    demoSel.innerHTML += `<option value="${c.demographic}">${c.label_ko} (${c.demographic})</option>`;
+    // value(20s/30s/40s)는 내부용으로 백엔드에 넘기고, 화면엔 "20대"처럼 깔끔하게만
+    demoSel.innerHTML += `<option value="${c.demographic}">${c.label_ko.replace(/^밈/, '')}</option>`;
   }
 
   activeDemographic = demoSel.value;
