@@ -1,6 +1,18 @@
 /* Meme Cardnews GUI */
 
-let sessionId = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+// crypto.randomUUID() only exists in a secure context (HTTPS or localhost).
+// On plain-HTTP / IP access (e.g. http://<server-ip>:8501) it is undefined and
+// throws, which would kill this whole script before init() ever runs.
+function genSessionId() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+  }
+  let s = '';
+  while (s.length < 12) s += Math.random().toString(16).slice(2);
+  return s.slice(0, 12);
+}
+
+let sessionId = genSessionId();
 let selectedPost = null;
 let selectedFormat = 'classic_dark';
 let hashtags = [];
@@ -20,6 +32,10 @@ function toast(msg, type = 'info') {
 
 async function api(path, opts = {}) {
   const res = await fetch(`/api${path}`, opts);
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`${res.status} /api${path} — ${detail.slice(0, 200)}`);
+  }
   return res.json();
 }
 
@@ -32,8 +48,20 @@ function esc(s) {
 // --- Init ---
 async function init() {
   updateCharCounts();
-  await loadAccountInfo();
-  await loadSettingsStatus();
+  try {
+    await loadAccountInfo();
+  } catch (e) {
+    console.error('loadAccountInfo failed:', e);
+    toast('계정 정보 로드 실패 — 콘솔(F12) 확인', 'error');
+  }
+  try {
+    await loadSettingsStatus();
+  } catch (e) {
+    console.error('loadSettingsStatus failed:', e);
+    const el = document.getElementById('statusKeys');
+    el.className = 'status-dot red';
+    el.textContent = 'API 확인 실패';
+  }
 }
 
 // --- Settings ---
@@ -509,7 +537,7 @@ document.getElementById('btnFinalize').addEventListener('click', async () => {
 });
 
 function resetAll() {
-  sessionId = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+  sessionId = genSessionId();
   selectedPost = null;
   hashtags = [];
   document.getElementById('hookText').value = '';
