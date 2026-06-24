@@ -359,30 +359,17 @@ html, body {
   z-index: 2;
 }
 
+/* 위치 클래스: anchoring/padding 만 (배경은 meme-bg-* 가 담당) */
 .meme-text-area.meme-text-bottom {
   bottom: 0;
   top: auto;
   padding: 48px 56px 72px;
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.95) 0%,
-    rgba(0,0,0,0.85) 40%,
-    rgba(0,0,0,0.5) 75%,
-    transparent 100%
-  );
 }
 
 .meme-text-area.meme-text-top {
   top: 0;
   bottom: auto;
   padding: 72px 56px 48px;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.95) 0%,
-    rgba(0,0,0,0.85) 40%,
-    rgba(0,0,0,0.5) 75%,
-    transparent 100%
-  );
 }
 
 .meme-text-area.meme-text-center {
@@ -392,6 +379,35 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 48px 56px;
+}
+
+/* 배경 처리(위치와 독립) */
+.meme-text-area.meme-bg-none { background: none; }
+
+.meme-text-area.meme-bg-shadow { background: none; }
+.meme-bg-shadow .meme-hook-text { text-shadow: 0 2px 12px rgba(0,0,0,0.9); }
+
+.meme-text-area.meme-bg-bar { background: rgba(0,0,0,0.85); }
+
+.meme-text-area.meme-text-bottom.meme-bg-gradient {
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.85) 40%,
+    rgba(0,0,0,0.5) 75%,
+    transparent 100%
+  );
+}
+.meme-text-area.meme-text-top.meme-bg-gradient {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.85) 40%,
+    rgba(0,0,0,0.5) 75%,
+    transparent 100%
+  );
+}
+.meme-text-area.meme-text-center.meme-bg-gradient {
   background: rgba(0,0,0,0.5);
 }
 

@@ -326,8 +326,15 @@ async function loadFormats() {
     grid.appendChild(card);
   }
 
-  if (!data.formats || data.formats.length === 0) {
-    grid.innerHTML = '<div style="color:#888;padding:20px;">기본 포맷을 사용합니다.</div>';
+  // 디렉토리 기반이라 기본 selectedFormat 이 안 맞을 수 있음 → 첫 카드 자동 선택
+  const opts = data.formats || [];
+  if (opts.length && !opts.some(f => f.id === selectedFormat)) {
+    selectedFormat = opts[0].id;
+    grid.querySelector('.format-card')?.classList.add('selected');
+  }
+
+  if (opts.length === 0) {
+    grid.innerHTML = '<div style="color:#888;padding:20px;">기본 포맷을 사용합니다. (썸네일 폴더에 이미지를 넣어보세요)</div>';
   }
 }
 

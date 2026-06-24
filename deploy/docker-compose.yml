@@ -16,6 +16,9 @@ services:
       - ./credentials.json:/app/credentials.json
       # accounts.yaml (서버에서 직접 수정 가능)
       - ./accounts.yaml:/app/accounts.yaml
+      # 오버레이 프리셋: 썸네일 드롭=즉시 반영, formats.yaml 편집=다음 picker 로드 (호스트에 먼저 존재해야 함)
+      - ./formats/thumbnails:/app/src/gui/formats/thumbnails
+      - ./formats/formats.yaml:/app/src/gui/formats/formats.yaml
       # DB 영속성
       - ./data:/app/data
     restart: unless-stopped

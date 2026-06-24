@@ -9,3 +9,30 @@ formats:
       punchline: "card_meme_punchline.html"
       outro: "card_meme_outro.html"
     style_overrides: {}
+
+# 오버레이 프리셋 — 썸네일 파일명(thumbnails/ 안)을 키로.
+# 엔트리 없는 이미지는 기본값(가운데·흰색·60px·그림자·contain) 적용.
+# 필드: text_position(top|center|bottom|auto), text_color, text_size(px),
+#       text_bg(none|shadow|bar|gradient), image_fit(cover|contain)
+overlays:
+  "1.jpg":
+    name: "센터 빅 화이트"
+    text_position: center
+    text_color: "#FFFFFF"
+    text_size: 60
+    text_bg: shadow
+    image_fit: contain
+  "2.jpg":
+    name: "상단 블랙바"
+    text_position: top
+    text_color: "#FFFFFF"
+    text_size: 50
+    text_bg: bar
+    image_fit: cover
+  "3.jpg":
+    name: "하단 그라데이션"
+    text_position: bottom
+    text_color: "#FFFFFF"
+    text_size: 52
+    text_bg: gradient
+    image_fit: contain

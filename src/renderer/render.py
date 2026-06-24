@@ -75,6 +75,7 @@ async def render_slides(
     slide_images: list[str | None] | None = None,
     file_prefix: str = "",
     content_type: str = "news",
+    overlay: dict | None = None,
 ) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -85,7 +86,7 @@ async def render_slides(
 
     if is_meme:
         all_htmls = _build_meme_slides(
-            card_data, handle, accent, cover_image, slide_images,
+            card_data, handle, accent, cover_image, slide_images, overlay,
         )
     else:
         all_htmls = _build_news_slides(
@@ -155,23 +156,29 @@ def _build_meme_slides(
     accent: str,
     cover_image: str | None,
     slide_images: list[str | None] | None,
+    overlay: dict | None = None,
 ) -> list[str]:
     htmls = []
+    overlay = overlay or {}
     hook_text = card_data.get("hook_text", card_data.get("title", ""))
     punchline = card_data.get("punchline", "")
     content_mode = card_data.get("_content_mode", "text")
     content_data = card_data.get("_content_data", [])
 
-    from src.crawler.image_fetcher import analyze_cover_layout
-
-    layout = "center"
-    if cover_image:
-        try:
-            img_bytes = base64.b64decode(cover_image.split(",")[1])
-            layout = analyze_cover_layout(img_bytes)
-        except Exception:
-            layout = "bottom"
-    logger.info(f"Cover layout: {layout}")
+    # 위치: 프리셋이 지정하면 그대로, 아니면(또는 auto) 이미지 분석 폴백
+    pos = overlay.get("text_position")
+    if pos and pos != "auto":
+        layout = pos
+    else:
+        from src.crawler.image_fetcher import analyze_cover_layout
+        layout = "center"
+        if cover_image:
+            try:
+                img_bytes = base64.b64decode(cover_image.split(",")[1])
+                layout = analyze_cover_layout(img_bytes)
+            except Exception:
+                layout = "bottom"
+    logger.info(f"Cover layout: {layout} (preset pos={pos})")
 
     hook_tpl = env.get_template("card_meme_hook.html")
     hook_html = hook_tpl.render(
@@ -179,6 +186,10 @@ def _build_meme_slides(
         text=hook_text,
         handle=handle,
         layout=layout,
+        text_color=overlay.get("text_color", "#FFFFFF"),
+        text_size=overlay.get("text_size", 60),
+        text_bg=overlay.get("text_bg", "shadow"),
+        image_fit=overlay.get("image_fit", "contain"),
     )
     htmls.append(_inline_css(hook_html))
 

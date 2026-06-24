@@ -7,12 +7,12 @@
 <body>
 <div class="meme-hook">
   {% if cover_image %}
-  <div class="meme-img" style="background-image: url('{{ cover_image }}');"></div>
+  <div class="meme-img" style="background-image: url('{{ cover_image }}'); background-size: {{ image_fit|default('contain') }};"></div>
   {% else %}
   <div class="meme-img meme-img-empty"></div>
   {% endif %}
-  <div class="meme-text-area meme-text-{{ layout|default('bottom') }}">
-    <div class="meme-hook-text">{{ text }}</div>
+  <div class="meme-text-area meme-text-{{ layout|default('center') }} meme-bg-{{ text_bg|default('shadow') }}">
+    <div class="meme-hook-text" style="color: {{ text_color|default('#FFFFFF') }}; font-size: {{ text_size|default(60) }}px;">{{ text }}</div>
   </div>
   <div class="meme-watermark">@{{ handle }}</div>
 </div>

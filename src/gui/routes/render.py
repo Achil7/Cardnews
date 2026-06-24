@@ -11,6 +11,7 @@ from loguru import logger
 from pydantic import BaseModel
 
 from config import PROJECT_ROOT, accounts_config
+from src.gui.format_loader import resolve_overlay
 from src.gui.session import get_session_dir
 
 router = APIRouter()
@@ -103,6 +104,7 @@ async def preview(req: PreviewRequest):
             slide_images=[],
             file_prefix="",
             content_type="meme",
+            overlay=resolve_overlay(req.format_id),
         )
 
         slides = []
@@ -152,6 +154,7 @@ async def finalize(req: FinalizeRequest):
             slide_images=[],
             file_prefix="",
             content_type="meme",
+            overlay=resolve_overlay(req.format_id),
         )
 
         drive_url = None
