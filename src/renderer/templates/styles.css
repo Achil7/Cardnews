@@ -416,8 +416,18 @@ html, body {
   font-weight: 800;
   line-height: 1.35;
   color: #FFFFFF;
+  text-align: center;
+  width: 100%;
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+/* 흰 글씨 + 두꺼운 검은 외곽선 (이슈/밈 카드 느낌). 굵기는 폰트크기 비례. */
+.meme-hook-text.meme-outline {
+  font-weight: 900;
+  -webkit-text-stroke: 0.1em #000;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.55);
 }
 
 .meme-watermark {

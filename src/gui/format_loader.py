@@ -19,13 +19,14 @@ _VALID_POSITION = {"top", "center", "bottom", "auto"}
 _VALID_BG = {"none", "shadow", "bar", "gradient"}
 _VALID_FIT = {"cover", "contain"}
 
-# 사용자가 말한 기본 스타일: 가운데, 크게, 흰색, 그림자, 스크린샷 그대로(contain)
+# 기본 스타일: 이슈카드 느낌 — 하단, 크게, 흰색, 검은 외곽선, 어두운 그라데이션, 스크린샷 그대로(contain)
 DEFAULT_OVERLAY = {
-    "text_position": "center",
+    "text_position": "bottom",
     "text_color": "#FFFFFF",
-    "text_size": 60,
-    "text_bg": "shadow",
+    "text_size": 64,
+    "text_bg": "gradient",
     "image_fit": "contain",
+    "text_outline": True,
 }
 
 
@@ -67,6 +68,10 @@ def _merge_overlay(raw: dict | None) -> dict:
 
     fit = str(raw.get("image_fit", o["image_fit"])).lower()
     o["image_fit"] = fit if fit in _VALID_FIT else DEFAULT_OVERLAY["image_fit"]
+
+    if "text_outline" in raw:
+        val = raw["text_outline"]
+        o["text_outline"] = str(val).strip().lower() not in ("false", "0", "no", "none", "")
 
     return o
 

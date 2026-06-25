@@ -11,28 +11,32 @@ formats:
     style_overrides: {}
 
 # 오버레이 프리셋 — 썸네일 파일명(thumbnails/ 안)을 키로.
-# 엔트리 없는 이미지는 기본값(가운데·흰색·60px·그림자·contain) 적용.
+# 엔트리 없는 이미지는 기본값(하단·흰색·64px·그라데이션·외곽선·contain) 적용.
 # 필드: text_position(top|center|bottom|auto), text_color, text_size(px),
-#       text_bg(none|shadow|bar|gradient), image_fit(cover|contain)
+#       text_bg(none|shadow|bar|gradient), image_fit(cover|contain),
+#       text_outline(true|false = 흰글씨 검은 외곽선)
 overlays:
   "1.jpg":
-    name: "센터 빅 화이트"
-    text_position: center
-    text_color: "#FFFFFF"
-    text_size: 60
-    text_bg: shadow
-    image_fit: contain
-  "2.jpg":
-    name: "상단 블랙바"
-    text_position: top
-    text_color: "#FFFFFF"
-    text_size: 50
-    text_bg: bar
-    image_fit: cover
-  "3.jpg":
-    name: "하단 그라데이션"
+    name: "하단 외곽선"          # 이슈카드 기본형: 이미지 위 + 하단 굵은 흰글씨+검정외곽선
     text_position: bottom
     text_color: "#FFFFFF"
-    text_size: 52
+    text_size: 64
     text_bg: gradient
     image_fit: contain
+    text_outline: true
+  "2.jpg":
+    name: "하단 블랙바 외곽선"    # 이미지 꽉채우고 하단 검은띠 위 글씨
+    text_position: bottom
+    text_color: "#FFFFFF"
+    text_size: 60
+    text_bg: bar
+    image_fit: cover
+    text_outline: true
+  "3.jpg":
+    name: "가운데 외곽선"
+    text_position: center
+    text_color: "#FFFFFF"
+    text_size: 64
+    text_bg: none
+    image_fit: contain
+    text_outline: true

@@ -11,8 +11,8 @@
   {% else %}
   <div class="meme-img meme-img-empty"></div>
   {% endif %}
-  <div class="meme-text-area meme-text-{{ layout|default('center') }} meme-bg-{{ text_bg|default('shadow') }}">
-    <div class="meme-hook-text" style="color: {{ text_color|default('#FFFFFF') }}; font-size: {{ text_size|default(60) }}px;">{{ text }}</div>
+  <div class="meme-text-area meme-text-{{ layout|default('bottom') }} meme-bg-{{ text_bg|default('gradient') }}">
+    <div class="meme-hook-text{% if text_outline %} meme-outline{% endif %}" style="color: {{ text_color|default('#FFFFFF') }}; font-size: {{ text_size|default(64) }}px;">{{ text }}</div>
   </div>
   <div class="meme-watermark">@{{ handle }}</div>
 </div>

@@ -187,9 +187,10 @@ def _build_meme_slides(
         handle=handle,
         layout=layout,
         text_color=overlay.get("text_color", "#FFFFFF"),
-        text_size=overlay.get("text_size", 60),
-        text_bg=overlay.get("text_bg", "shadow"),
+        text_size=overlay.get("text_size", 64),
+        text_bg=overlay.get("text_bg", "gradient"),
         image_fit=overlay.get("image_fit", "contain"),
+        text_outline=overlay.get("text_outline", True),
     )
     htmls.append(_inline_css(hook_html))
 
@@ -219,11 +220,7 @@ def _build_meme_slides(
         )
         htmls.append(_inline_css(punch_html))
 
-    outro_tpl = env.get_template("card_meme_outro.html")
-    bg = MEME_BG_COLORS[(len(htmls) + 1) % len(MEME_BG_COLORS)]
-    outro_html = outro_tpl.render(bg_color=bg, handle=handle)
-    htmls.append(_inline_css(outro_html))
-
+    # 아웃트로(팔로우 유도) 슬라이드 제거 — 밈인데 홍보 느낌이라 뺌
     return htmls
 
 
