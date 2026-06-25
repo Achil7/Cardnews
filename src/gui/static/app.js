@@ -318,7 +318,11 @@ async function loadFormats() {
       card.classList.add('selected');
     };
     card.innerHTML = `
-      <div class="format-thumb">${f.thumbnail ? `<img src="/format-thumbnails/${f.thumbnail}" alt="">` : '?'}</div>
+      <div class="format-thumb" style="position:relative;">
+        ${f.thumbnail ? `<img src="/format-thumbnails/${f.thumbnail}" alt="">` : '?'}
+        <button title="삭제" onclick="event.stopPropagation(); deleteThumbnail('${f.id}')"
+          style="position:absolute;top:6px;right:6px;width:24px;height:24px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;cursor:pointer;font-size:16px;line-height:1;">&times;</button>
+      </div>
       <div class="format-info">
         <div class="format-name">${esc(f.name)}</div>
         <div class="format-desc">${esc(f.description)}</div>
@@ -334,7 +338,37 @@ async function loadFormats() {
   }
 
   if (opts.length === 0) {
-    grid.innerHTML = '<div style="color:#888;padding:20px;">기본 포맷을 사용합니다. (썸네일 폴더에 이미지를 넣어보세요)</div>';
+    grid.innerHTML = '<div style="color:#888;padding:20px;">예시 이미지를 추가하면 선택지로 떠요. (없으면 기본 스타일로 렌더)</div>';
+  }
+}
+
+// --- 예시 썸네일 업로드/삭제 ---
+document.getElementById('btnAddThumb')?.addEventListener('click', () => {
+  document.getElementById('thumbInput').click();
+});
+document.getElementById('thumbInput')?.addEventListener('change', async (ev) => {
+  const files = ev.target.files;
+  if (!files.length) return;
+  const form = new FormData();
+  for (const f of files) form.append('files', f);
+  toast('업로드 중...', 'info');
+  try {
+    const data = await api('/thumbnails', { method: 'POST', body: form });
+    toast(`${(data.saved || []).length}개 예시 추가됨`, 'success');
+    await loadFormats();
+  } catch (e) {
+    toast('업로드 실패: ' + e.message, 'error');
+  }
+  ev.target.value = '';
+});
+
+async function deleteThumbnail(id) {
+  if (!confirm('이 예시 이미지를 삭제할까요?')) return;
+  try {
+    await api(`/thumbnails/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await loadFormats();
+  } catch (e) {
+    toast('삭제 실패: ' + e.message, 'error');
   }
 }
 

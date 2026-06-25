@@ -67,7 +67,11 @@
     <div class="step-title">포맷 선택 & 텍스트 생성</div>
     <div class="two-col">
       <div>
-        <div style="font-size:14px;font-weight:600;color:#999;margin-bottom:12px;">포맷 선택</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:14px;font-weight:600;color:#999;">포맷 선택</span>
+          <button class="btn btn-secondary" id="btnAddThumb" style="padding:6px 12px;font-size:13px;">+ 예시 이미지 추가</button>
+        </div>
+        <input type="file" id="thumbInput" accept="image/*" multiple style="display:none;">
         <div class="format-grid" id="formatGrid"></div>
       </div>
       <div>
